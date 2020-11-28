@@ -1,0 +1,10 @@
+stages:
+  - test
+
+lint:
+  stage: test
+  tags:
+    - docker
+  image: golangci/golangci-lint:v1.32.2
+  script:
+    - golangci-lint run

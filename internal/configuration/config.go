@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
+	"go.dev.pztrn.name/metricator/internal/application"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,23 +23,7 @@ type Config struct {
 	configPath string
 	// Applications describes configuration for remote application's endpoints.
 	// Key is an application's name.
-	Applications map[string]struct {
-		// Endpoint is a remote application endpoint which should give us metrics
-		// in Prometheus format.
-		Endpoint string
-		// Headers is a list of headers that should be added to metrics request.
-		Headers map[string]string
-		// TimeBetweenRequests is a minimal amount of time which should pass
-		// between requests.
-		TimeBetweenRequests time.Duration
-	}
-	// Datastore describes data storage configuration.
-	Datastore struct {
-		// ValidTimeout is a timeout for which every data entry will be considered
-		// as valid. After that timeout if value wasn't updated it will be considered
-		// as invalid and purged from memory.
-		ValidTimeout time.Duration `yaml:"valid_timeout"`
-	} `yaml:"datastore"`
+	Applications map[string]*application.Config `yaml:"applications"`
 }
 
 // NewConfig returns new configuration.

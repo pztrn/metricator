@@ -14,12 +14,11 @@ Metricator will issue only one request and cache data in memory between them. Al
 
 ## Installation
 
-*TBW*
+TBW
 
 ## Configuration
 
-*TBW*
-
+TBW
 
 ## Documentation
 

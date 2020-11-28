@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"go.dev.pztrn.name/metricator/internal/application"
 	"go.dev.pztrn.name/metricator/internal/common"
 	"go.dev.pztrn.name/metricator/internal/configuration"
-	"go.dev.pztrn.name/metricator/internal/datastore"
 	"go.dev.pztrn.name/metricator/internal/httpserver"
 )
 
@@ -26,16 +26,27 @@ func main() {
 	config := configuration.NewConfig()
 
 	httpSrv, httpStopped := httpserver.NewHTTPServer(mainCtx, config)
-	dataStore, dataStoreStopped := datastore.NewDataStore(mainCtx, config)
 
+	// Parse configuration.
 	flag.Parse()
+
 	err := config.Parse()
 	if err != nil {
 		log.Fatalln("Failed to parse configuration:", err.Error())
 	}
+
 	log.Printf("Configuration parsed: %+v\n", config)
 
-	dataStore.Start()
+	// Create applications.
+	apps := make([]*application.Application, 0, len(config.Applications))
+
+	for appName, appConfig := range config.Applications {
+		app := application.NewApplication(mainCtx, appName, appConfig)
+		app.Start()
+
+		apps = append(apps, app)
+	}
+
 	httpSrv.Start()
 
 	log.Println("Metricator is started and ready to serve requests")
@@ -46,15 +57,18 @@ func main() {
 
 	signal.Notify(signalHandler, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
+	go func(apps []*application.Application) {
 		<-signalHandler
 		cancelFunc()
 
-		<-dataStoreStopped
+		for _, app := range apps {
+			<-app.GetDoneChan()
+		}
+
 		<-httpStopped
 
 		shutdownDone <- true
-	}()
+	}(apps)
 
 	<-shutdownDone
 	log.Println("Metricator stopped")

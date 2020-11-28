@@ -1,6 +1,8 @@
 # This is a Metricator Makefile.
 # It contains calls to scripts placed in scripts directory.
 
+CONFIG ?= ./metricator.example.yaml
+
 help: Makefile
 	@echo -e "Metricator Makefile available subcommands:\n"
 	@cat $< | grep "## " | sort | sed -n 's/^## //p'
@@ -19,7 +21,7 @@ metricatord-build: check-build-dir
 
 ## metricatord-run: starts metricator daemon.
 metricatord-run: metricatord-build
-	./._bin/metricatord -config ./metricator.example.yaml
+	./._bin/metricatord -config ${CONFIG}
 
 show-git-data:
 	@echo "Parameters for current source code state:"
