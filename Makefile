@@ -5,7 +5,7 @@ help: Makefile
 	@echo -e "Metricator Makefile available subcommands:\n"
 	@cat $< | grep "## " | sort | sed -n 's/^## //p'
 	@echo ""
-	@make -f Makefile show-git-data
+	@make show-git-data
 
 .DEFAULT_GOAL := help
 
@@ -14,8 +14,8 @@ check-build-dir:
 
 ## metricatord-build: builds metricator daemon and places into ${PWD}/._bin.
 metricatord-build: check-build-dir
-	rm ./._bin/metricatord || true
-	cd cmd/metricatord && go build -o ../../._bin/metricatord
+	@rm ./._bin/metricatord || true
+	@scripts/build.sh metricatord
 
 ## metricatord-run: starts metricator daemon.
 metricatord-run: metricatord-build
