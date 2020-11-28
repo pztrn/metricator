@@ -5,6 +5,6 @@ lint:
   stage: test
   tags:
     - docker
-  image: golangci/golangci-lint:v1.32.2
+  image: gitlab.pztrn.name/containers/dependency_proxy/containers/golangci/golangci-lint:v1.32.2
   script:
     - golangci-lint run
