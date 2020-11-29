@@ -65,7 +65,7 @@ func (a *Application) fetch() {
 func (a *Application) startFetcher() {
 	fetchTicker := time.NewTicker(a.config.TimeBetweenRequests)
 
-	// nolint:exaustivestruct
+	// nolint:exhaustivestruct
 	a.httpClient = &http.Client{
 		Timeout: time.Second * 5,
 	}

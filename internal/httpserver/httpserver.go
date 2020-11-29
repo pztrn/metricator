@@ -41,7 +41,7 @@ func (h *HTTPServer) getRequestContext(_ net.Listener) context.Context {
 func (h *HTTPServer) initialize() {
 	h.handler = &handler{}
 	// We do not need to specify all possible parameters for HTTP server, so:
-	// nolint:exaustivestruct
+	// nolint:exhaustivestruct
 	h.server = &http.Server{
 		// ToDo: make it all configurable.
 		Addr:           ":34421",
