@@ -60,6 +60,8 @@ func (s *Storage) Put(data map[string]string) {
 	for k, v := range data {
 		s.data[k] = v
 	}
+
+	log.Println("Put", len(data), "items in", s.name)
 }
 
 // Start starts asynchronous things if needed.
