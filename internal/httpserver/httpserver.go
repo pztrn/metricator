@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"go.dev.pztrn.name/metricator/internal/common"
 	"go.dev.pztrn.name/metricator/internal/configuration"
 )
 
@@ -39,7 +40,9 @@ func (h *HTTPServer) getRequestContext(_ net.Listener) context.Context {
 
 // Initializes handler and HTTP server structure.
 func (h *HTTPServer) initialize() {
-	h.handler = &handler{}
+	h.handler = &handler{
+		handlers: make(map[string]common.HTTPHandlerFunc),
+	}
 	// We do not need to specify all possible parameters for HTTP server, so:
 	// nolint:exhaustivestruct
 	h.server = &http.Server{
@@ -51,6 +54,11 @@ func (h *HTTPServer) initialize() {
 		WriteTimeout:   time.Second * 10,
 		MaxHeaderBytes: 1 << 20,
 	}
+}
+
+// RegisterHandlerForApplication registers HTTP handler for application.
+func (h *HTTPServer) RegisterHandlerForApplication(name string, handler common.HTTPHandlerFunc) {
+	h.handler.register(name, handler)
 }
 
 // Start starts HTTP server in another goroutine and one more goroutine which

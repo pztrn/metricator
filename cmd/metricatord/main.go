@@ -44,6 +44,8 @@ func main() {
 		app := application.NewApplication(mainCtx, appName, appConfig)
 		app.Start()
 
+		httpSrv.RegisterHandlerForApplication(appName, app.GetHandler())
+
 		apps = append(apps, app)
 	}
 

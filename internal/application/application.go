@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 
+	"go.dev.pztrn.name/metricator/internal/common"
 	"go.dev.pztrn.name/metricator/internal/storage"
 	"go.dev.pztrn.name/metricator/internal/storage/memory"
 )
@@ -44,6 +45,11 @@ func NewApplication(ctx context.Context, name string, config *Config) *Applicati
 // application's routines are completed.
 func (a *Application) GetDoneChan() chan struct{} {
 	return a.doneChan
+}
+
+// GetHandler returns HTTP requests handling function.
+func (a *Application) GetHandler() common.HTTPHandlerFunc {
+	return a.respond
 }
 
 // Initializes internal things like storage, HTTP client, etc.
