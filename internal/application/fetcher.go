@@ -19,6 +19,10 @@ func (a *Application) fetch() {
 		return
 	}
 
+	a.fetchIsRunningMutex.Lock()
+	a.fetchIsRunning = true
+	a.fetchIsRunningMutex.Unlock()
+
 	log.Println("Fetching data for", a.name)
 
 	req, err := http.NewRequestWithContext(a.ctx, "GET", a.config.Endpoint, nil)
@@ -51,10 +55,6 @@ func (a *Application) fetch() {
 	data := a.parse(string(body))
 
 	a.storage.Put(data)
-
-	a.fetchIsRunningMutex.Lock()
-	a.fetchIsRunning = true
-	a.fetchIsRunningMutex.Unlock()
 
 	a.fetchIsRunningMutex.Lock()
 	a.fetchIsRunning = false
