@@ -21,3 +21,5 @@ linters-settings:
     line-length: 120
   gocyclo:
     min-complexity: 40
+  gocognit:
+    min-complexity: 40

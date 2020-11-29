@@ -3,6 +3,8 @@ package application
 import (
 	"context"
 	"log"
+	"net/http"
+	"sync"
 
 	"go.dev.pztrn.name/metricator/internal/storage"
 	"go.dev.pztrn.name/metricator/internal/storage/memory"
@@ -18,6 +20,11 @@ type Application struct {
 
 	storage     storage.Metrics
 	storageDone chan struct{}
+
+	fetchIsRunning      bool
+	fetchIsRunningMutex sync.RWMutex
+
+	httpClient *http.Client
 }
 
 // NewApplication creates new application.
@@ -49,6 +56,8 @@ func (a *Application) initialize() {
 // Start starts asynchronous things like data fetching, storage cleanup, etc.
 func (a *Application) Start() {
 	a.storage.Start()
+
+	go a.startFetcher()
 
 	// The Context Listening Goroutine.
 	go func() {
