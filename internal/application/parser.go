@@ -39,57 +39,7 @@ func (a *Application) parse(body string) map[string]string {
 		} else {
 			value = strings.Split(line, " ")[1]
 			name = strings.Split(line, "{")[0]
-
-			// Parse params into "name:value" string.
-			valuesString := strings.Split(strings.Split(line, "{")[1], "}")[0]
-
-			var (
-				paramName, paramValue                                    string
-				paramNameFinished, paramValueStarted, paramValueFinished bool
-			)
-
-			for _, r := range valuesString {
-				if paramValueFinished && string(r) == "," {
-					params = append(params, paramName+":"+paramValue)
-					paramName, paramValue = "", ""
-					paramNameFinished, paramValueStarted, paramValueFinished = false, false, false
-
-					continue
-				}
-				if !paramNameFinished {
-					if string(r) != "=" {
-						paramName += string(r)
-
-						continue
-					} else {
-						paramNameFinished = true
-
-						continue
-					}
-				} else {
-					if string(r) == "\"" && !paramValueStarted {
-						paramValueStarted = true
-
-						continue
-					}
-
-					if paramValueStarted && string(r) != "\"" {
-						paramValue += string(r)
-
-						continue
-					}
-
-					if paramValueStarted && string(r) == "\"" {
-						paramValueFinished = true
-
-						continue
-					}
-				}
-			}
-
-			if paramName != "" && paramValue != "" {
-				params = append(params, paramName+":"+paramValue)
-			}
+			params = a.getParametersForPrometheusMetric(line)
 
 			for _, param := range params {
 				name += "/" + param
@@ -102,4 +52,64 @@ func (a *Application) parse(body string) map[string]string {
 	log.Printf("Data parsed: %+v\n", data)
 
 	return data
+}
+
+// Parses passed line and returns a slice of strings with parameters parsed.
+func (a *Application) getParametersForPrometheusMetric(line string) []string {
+	valuesString := strings.Split(strings.Split(line, "{")[1], "}")[0]
+
+	var (
+		params                                                   []string
+		paramName, paramValue                                    string
+		paramNameFinished, paramValueStarted, paramValueFinished bool
+	)
+
+	for _, r := range valuesString {
+		if paramValueFinished && string(r) == "," {
+			params = append(params, paramName+":"+paramValue)
+			paramName, paramValue = "", ""
+			paramNameFinished, paramValueStarted, paramValueFinished = false, false, false
+
+			continue
+		}
+
+		// Sometimes nestif causes questions, like here. Is code below is
+		// "deply nested"? I think not. So:
+		// nolint:nestif
+		if !paramNameFinished {
+			if string(r) != "=" {
+				paramName += string(r)
+
+				continue
+			} else {
+				paramNameFinished = true
+
+				continue
+			}
+		} else {
+			if string(r) == "\"" && !paramValueStarted {
+				paramValueStarted = true
+
+				continue
+			}
+
+			if paramValueStarted && string(r) != "\"" {
+				paramValue += string(r)
+
+				continue
+			}
+
+			if paramValueStarted && string(r) == "\"" {
+				paramValueFinished = true
+
+				continue
+			}
+		}
+	}
+
+	if paramName != "" && paramValue != "" {
+		params = append(params, paramName+":"+paramValue)
+	}
+
+	return params
 }
