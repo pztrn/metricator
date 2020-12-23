@@ -18,8 +18,8 @@ func (a *Application) parse(body string) map[string]models.Metric {
 		// Prometheus line contains metric name and metric parameters defined
 		// in "{}".
 		var (
-			name, value string
-			params      []string
+			name   string
+			params []string
 		)
 
 		// Skip empty lines.
@@ -27,29 +27,61 @@ func (a *Application) parse(body string) map[string]models.Metric {
 			continue
 		}
 
-		// Check that line isn't commented. We should skip comments for now.
+		log.Println("Analyzing line:", line)
+
+		name = a.getMetricName(line)
+		metric, found := data[name]
+		if !found {
+			metric = models.NewMetric(name, "", "", nil)
+		}
+
+		// If line is commented - then we have something about metric's description
+		// or type. It should be handled in special way - these metric will became
+		// "pseudometric" which will be used as template for next iterations. For
+		// example if HELP line was parsed first, then TYPE line will be parsed and
+		// data will be added to already existing metric. If next line which should
+		// represent metric itself contains parameters (e.g. "{instance='host1'}")
+		// then next code block will COPY populated with HELP and TYPE pesudometric
+		// and put it's value as new metric with different name (metric/instance:host1
+		// in this example).
 		if strings.HasPrefix(line, "#") {
+			switch strings.Split(line, " ")[1] {
+			case "HELP":
+				log.Println("Got HELP line")
+
+				metric.Description = a.getMetricDescription(line)
+			case "TYPE":
+				log.Println("Got TYPE line")
+
+				metric.Type = a.getMetricType(line)
+			}
+
+			data[name] = metric
+
+			// According to https://github.com/Showmax/prometheus-docs/blob/master/content/docs/instrumenting/exposition_formats.md
+			// HELP and TYPE lines should be printed before actual metric. Do not even
+			// report bugs regarding that!
 			continue
 		}
 
-		log.Println("Analyzing line:", line)
+		// Parametrized metrics should have own piece of love - we should
+		// add parameters to metric's name. This would also require metrics
+		// structure copying.
+		if strings.Contains(line, "{") {
+			newMetric := metric
 
-		// Check if we have parametrized metric. If no - push it to data map.
-		if !strings.Contains(line, "{") {
-			name = strings.Split(line, " ")[0]
-			value = strings.Split(line, " ")[1]
-		} else {
-			value = strings.Split(line, " ")[1]
-			name = strings.Split(line, "{")[0]
 			params = a.getParametersForPrometheusMetric(line)
-
 			for _, param := range params {
-				name += "/" + param
+				newMetric.Name += "/" + param
 			}
+
+			metric = newMetric
+			data[metric.Name] = metric
 		}
 
-		metric := models.NewMetric(name, "", "", params)
-		metric.SetValue(value)
+		metric.Value = a.getMetricValue(line)
+
+		log.Printf("Got metric: %+v\n", metric)
 
 		data[name] = metric
 	}
@@ -57,6 +89,38 @@ func (a *Application) parse(body string) map[string]models.Metric {
 	log.Printf("Data parsed: %+v\n", data)
 
 	return data
+}
+
+// Gets metric description from passed line.
+func (a *Application) getMetricDescription(line string) string {
+	return strings.Join(strings.Split(line, " ")[3:], " ")
+}
+
+// Gets metric name from passed line.
+func (a *Application) getMetricName(line string) string {
+	var metricNameData string
+
+	if strings.HasPrefix(line, "#") {
+		metricNameData = strings.Split(line, " ")[2]
+	} else {
+		metricNameData = strings.Split(line, " ")[0]
+	}
+
+	return strings.Split(metricNameData, "{")[0]
+}
+
+// Gets metric type from passed line.
+func (a *Application) getMetricType(line string) string {
+	return strings.Split(line, " ")[3]
+}
+
+// Gets metric value from passed line.
+func (a *Application) getMetricValue(line string) string {
+	if strings.Contains(line, "}") {
+		return strings.Split(line, "} ")[1]
+	}
+
+	return strings.Split(line, " ")[1]
 }
 
 // Parses passed line and returns a slice of strings with parameters parsed.

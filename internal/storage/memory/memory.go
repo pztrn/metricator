@@ -74,7 +74,10 @@ func (s *Storage) Put(data map[string]models.Metric) {
 	defer s.dataMutex.Unlock()
 
 	for k, v := range data {
-		s.data[k] = v
+		// We should not put valueless metrics.
+		if v.Value != "" {
+			s.data[k] = v
+		}
 	}
 
 	log.Println("Put", len(data), "items in", s.name)
