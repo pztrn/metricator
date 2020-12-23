@@ -1,7 +1,6 @@
 package application
 
 import (
-	"log"
 	"strings"
 
 	"go.dev.pztrn.name/metricator/internal/models"
@@ -27,7 +26,7 @@ func (a *Application) parse(body string) map[string]models.Metric {
 			continue
 		}
 
-		log.Println("Analyzing line:", line)
+		// log.Println("Analyzing line:", line)
 
 		name = a.getMetricName(line)
 		metric, found := data[name]
@@ -47,12 +46,8 @@ func (a *Application) parse(body string) map[string]models.Metric {
 		if strings.HasPrefix(line, "#") {
 			switch strings.Split(line, " ")[1] {
 			case "HELP":
-				log.Println("Got HELP line")
-
 				metric.Description = a.getMetricDescription(line)
 			case "TYPE":
-				log.Println("Got TYPE line")
-
 				metric.Type = a.getMetricType(line)
 			}
 
@@ -81,12 +76,12 @@ func (a *Application) parse(body string) map[string]models.Metric {
 
 		metric.Value = a.getMetricValue(line)
 
-		log.Printf("Got metric: %+v\n", metric)
+		// log.Printf("Got metric: %+v\n", metric)
 
 		data[name] = metric
 	}
 
-	log.Printf("Data parsed: %+v\n", data)
+	// log.Printf("Data parsed: %+v\n", data)
 
 	return data
 }
