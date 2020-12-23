@@ -7,7 +7,7 @@ applications:
     # Headers to append to request.
     headers:
       X-API-KEY: th4apik3yh4rdt0gu3ss
-    # Timeout between requests. Not neccessarily be exact and requests might
+    # Timeout between requests. Not necessarily be exact and requests might
     # be sent in 60 or more seconds (in this example).
     time_between_requests: 60s
 
