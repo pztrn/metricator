@@ -9,7 +9,7 @@ ARG CI_COMMIT_REF_NAME
 ARG CI_COMMIT_TAG
 
 ENV CGO_ENABLED=0
-RUN apk add git make
+RUN apk add bash git make
 RUN make metricatord-build
 
 FROM registry.gitlab.pztrn.name/containers/mirror/golang:1.15.5-alpine
