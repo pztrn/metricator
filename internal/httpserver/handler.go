@@ -153,6 +153,25 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write(appsList)
 
 		return
+	case "info":
+		infoData := struct {
+			Branch     string
+			Build      string
+			CommitHash string
+			Version    string
+		}{
+			Branch:     common.Branch,
+			Build:      common.Build,
+			CommitHash: common.CommitHash,
+			Version:    common.Version,
+		}
+
+		infoBytes, _ := json.Marshal(infoData)
+
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(infoBytes)
+
+		return
 	case "metrics":
 		handler, found := h.handlers[rInfo.Application]
 		if !found {
