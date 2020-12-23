@@ -2,6 +2,8 @@ package models
 
 // Metric is a generic metric structure.
 type Metric struct {
+	// BaseName is a metric's base name, used for constructing name.
+	BaseName string
 	// Name is a metric name.
 	Name string
 	// Description is a metric description from HELP line.
@@ -17,6 +19,7 @@ type Metric struct {
 // NewMetric creates new structure for storing single metric data.
 func NewMetric(name, mType, description string, params []string) Metric {
 	m := Metric{
+		BaseName:    name,
 		Name:        name,
 		Description: description,
 		Type:        mType,

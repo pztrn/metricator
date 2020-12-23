@@ -29,11 +29,16 @@ func (a *Application) parse(body string) map[string]models.Metric {
 		a.logger.Debugln("Analyzing line:", line)
 
 		name = a.getMetricName(line)
+		a.logger.Debugln("Got metric name:", name)
 
 		metric, found := data[name]
 		if !found {
+			a.logger.Debugln("Metric wasn't yet created, creating new structure")
+
 			metric = models.NewMetric(name, "", "", nil)
 		}
+
+		a.logger.Debugf("Got metric to use: %+v\n", metric)
 
 		// If line is commented - then we have something about metric's description
 		// or type. It should be handled in special way - these metric will became
@@ -65,11 +70,14 @@ func (a *Application) parse(body string) map[string]models.Metric {
 		// structure copying.
 		if strings.Contains(line, "{") {
 			newMetric := metric
+			newMetric.Name = newMetric.BaseName
 
 			params = a.getParametersForPrometheusMetric(line)
 			for _, param := range params {
 				newMetric.Name += "/" + param
 			}
+
+			newMetric.Params = params
 
 			metric = newMetric
 			data[metric.Name] = metric
