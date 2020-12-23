@@ -2,16 +2,16 @@ package models
 
 // Metric is a generic metric structure.
 type Metric struct {
-	// Metric name.
+	// Name is a metric name.
 	Name string
-	// HELP data, if present.
+	// Description is a metric description from HELP line.
 	Description string
-	// Additional parameters, data inside "{}".
-	Params []string
-	// Type is a metric type.
+	// Type is a metric type from TYPE line.
 	Type string
-	// Metric value.
+	// Value is a metric value.
 	Value string
+	// Params is an additional params which are placed inside "{}".
+	Params []string
 }
 
 // NewMetric creates new structure for storing single metric data.
@@ -21,6 +21,7 @@ func NewMetric(name, mType, description string, params []string) Metric {
 		Description: description,
 		Type:        mType,
 		Params:      params,
+		Value:       "",
 	}
 
 	return m

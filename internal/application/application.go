@@ -14,19 +14,16 @@ import (
 // Application is a thing that responsible for all application-related
 // actions like data fetching, storing, etc. on higher level.
 type Application struct {
-	config   *Config
-	ctx      context.Context
-	doneChan chan struct{}
-	logger   *logger.Logger
-	name     string
-
-	storage     storage.Metrics
-	storageDone chan struct{}
-
-	fetchIsRunning      bool
+	ctx                 context.Context
+	storage             storage.Metrics
+	config              *Config
+	doneChan            chan struct{}
+	logger              *logger.Logger
+	storageDone         chan struct{}
+	httpClient          *http.Client
+	name                string
 	fetchIsRunningMutex sync.RWMutex
-
-	httpClient *http.Client
+	fetchIsRunning      bool
 }
 
 // NewApplication creates new application.

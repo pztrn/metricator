@@ -29,6 +29,7 @@ func (a *Application) parse(body string) map[string]models.Metric {
 		a.logger.Debugln("Analyzing line:", line)
 
 		name = a.getMetricName(line)
+
 		metric, found := data[name]
 		if !found {
 			metric = models.NewMetric(name, "", "", nil)
@@ -53,9 +54,9 @@ func (a *Application) parse(body string) map[string]models.Metric {
 
 			data[name] = metric
 
-			// According to https://github.com/Showmax/prometheus-docs/blob/master/content/docs/instrumenting/exposition_formats.md
-			// HELP and TYPE lines should be printed before actual metric. Do not even
+			// According to docs HELP and TYPE lines should be printed before actual metric. Do not even
 			// report bugs regarding that!
+			// Docs: https://github.com/Showmax/prometheus-docs/blob/master/content/docs/instrumenting/exposition_formats.md
 			continue
 		}
 
@@ -76,12 +77,12 @@ func (a *Application) parse(body string) map[string]models.Metric {
 
 		metric.Value = a.getMetricValue(line)
 
-		a.logger.Debugln("Got metric: %+v\n", metric)
+		a.logger.Debugf("Got metric: %+v\n", metric)
 
 		data[name] = metric
 	}
 
-	a.logger.Debugln("Data parsed: %+v\n", data)
+	a.logger.Debugf("Data parsed: %+v\n", data)
 
 	return data
 }
@@ -138,7 +139,7 @@ func (a *Application) getParametersForPrometheusMetric(line string) []string {
 		}
 
 		// Sometimes nestif causes questions, like here. Is code below is
-		// "deply nested"? I think not. So:
+		// "deeply nested"? I think not. So:
 		// nolint:nestif
 		if !paramNameFinished {
 			if string(r) != "=" {

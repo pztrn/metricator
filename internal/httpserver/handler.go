@@ -39,7 +39,6 @@ func (h *handler) getAppsList() ([]byte, error) {
 	appsList, err := json.Marshal(apps)
 	if err != nil {
 		// ToDo: log error
-
 		return nil, errNoAppsRegistered
 	}
 
@@ -70,23 +69,41 @@ func (h *handler) getRequestInfo(r *http.Request) (*models.RequestInfo, error) {
 
 	// Parse API version.
 	apiVersionRaw := strings.TrimLeft(pathSplitted[2], "v")
+
 	apiVersion, err := strconv.Atoi(apiVersionRaw)
 	if err != nil {
 		// ToDo: log error
 		return nil, errInvalidAPIVersion
 	}
 
+	// Check used API version.
+	var supportedAPIVersionUsed bool
+
+	for _, version := range supportedAPIVersions {
+		if apiVersion == version {
+			supportedAPIVersionUsed = true
+
+			break
+		}
+	}
+
+	if !supportedAPIVersionUsed {
+		return nil, errInvalidAPIVersion
+	}
+
 	// Get request type and key.
 	requestType = pathSplitted[3]
+
 	if len(pathSplitted) >= 5 {
 		appName = pathSplitted[4]
 	}
+
 	if len(pathSplitted) >= 6 {
 		metricName = strings.Join(pathSplitted[5:], "/")
 	}
 
 	reqInfo := &models.RequestInfo{
-		ApiVersion:  apiVersion,
+		APIVersion:  apiVersion,
 		Application: appName,
 		Metric:      metricName,
 		RequestType: requestType,
@@ -103,8 +120,9 @@ func (h *handler) register(appName string, hndl common.HTTPHandlerFunc) {
 // ServeHTTP handles every HTTP request.
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
+
 	defer func() {
-		requestDuration := time.Now().Sub(startTime)
+		requestDuration := time.Since(startTime)
 
 		log.Printf("[HTTP Request] from %s to %s, duration %.4fs\n", r.RemoteAddr, r.URL.Path, requestDuration.Seconds())
 	}()
