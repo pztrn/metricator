@@ -15,7 +15,7 @@ RUN make metricatord-build
 FROM registry.gitlab.pztrn.name/containers/mirror/golang:1.15.5-alpine
 LABEL maintainer="Stanislav N. <pztrn@pztrn.name>"
 
-COPY --from=build /go/src/gitlab.pztrn.name/pztrn/metricator/.bin/metricatord /usr/local/bin/metricatord
+COPY --from=build /go/src/gitlab.pztrn.name/pztrn/metricator/._bin/metricatord /usr/local/bin/metricatord
 
 RUN apk add tzdata
 
