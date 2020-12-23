@@ -3,21 +3,21 @@ package models
 // Metric is a generic metric structure.
 type Metric struct {
 	// Metric name.
-	name string
+	Name string
 	// HELP data, if present.
-	description string
+	Description string
 	// Additional parameters, data inside "{}".
-	params []string
+	Params []string
 	// Metric value.
-	value string
+	Value string
 }
 
 // NewMetric creates new structure for storing single metric data.
 func NewMetric(name, description string, params []string) Metric {
 	m := Metric{
-		name:        name,
-		description: description,
-		params:      params,
+		Name:        name,
+		Description: description,
+		Params:      params,
 	}
 
 	return m
@@ -25,10 +25,10 @@ func NewMetric(name, description string, params []string) Metric {
 
 // GetValue returns metric's value.
 func (m *Metric) GetValue() string {
-	return m.value
+	return m.Value
 }
 
 // SetValue sets value for metric.
 func (m *Metric) SetValue(value string) {
-	m.value = value
+	m.Value = value
 }

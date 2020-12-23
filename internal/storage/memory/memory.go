@@ -46,6 +46,17 @@ func (s *Storage) Get(key string) (models.Metric, error) {
 	return data, nil
 }
 
+// GetAsSlice returns all data from storage as slice.
+func (s *Storage) GetAsSlice() []models.Metric {
+	metrics := make([]models.Metric, 0, len(s.data))
+
+	for _, metric := range s.data {
+		metrics = append(metrics, metric)
+	}
+
+	return metrics
+}
+
 // GetDoneChan returns a channel which should be used to block execution
 // until storage's routines are completed.
 func (s *Storage) GetDoneChan() chan struct{} {
