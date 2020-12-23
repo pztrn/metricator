@@ -1,3 +1,12 @@
+services:
+  - name: registry.gitlab.pztrn.name/containers/mirror/docker:19.03.13-dind
+    alias: docker
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TCP_PORT: 2375
+  DOCKER_TLS_CERTDIR: ""
+
 stages:
   - test
 
@@ -5,6 +14,6 @@ lint:
   stage: test
   tags:
     - docker
-  image: gitlab.pztrn.name/containers/dependency_proxy/containers/golangci/golangci-lint:v1.32.2
+  image: registry.gitlab.pztrn.name/containers/mirror/golangci/golangci-lint:v1.33.0
   script:
     - golangci-lint run
