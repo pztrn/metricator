@@ -1,13 +1,16 @@
 package application
 
 import (
-	"context"
-
-	"go.dev.pztrn.name/metricator/internal/common"
+	"go.dev.pztrn.name/metricator/internal/models"
 )
 
-func (a *Application) respond(ctx context.Context) string {
-	metricName := ctx.Value(common.ContextKeyMetric).(string)
+// Responds with needed data. First parameter is a type of data needed (like metric name),
+// second parameter is actual metric name. Second parameter also can be empty.
+func (a *Application) respond(rInfo *models.RequestInfo) string {
+	metric, err := a.storage.Get(rInfo.Metric)
+	if err != nil {
+		return ""
+	}
 
-	return a.storage.Get(metricName)
+	return metric.GetValue()
 }

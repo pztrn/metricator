@@ -3,11 +3,13 @@ package application
 import (
 	"log"
 	"strings"
+
+	"go.dev.pztrn.name/metricator/internal/models"
 )
 
 // Parses passed body and returns a map suitable for pushing into storage.
-func (a *Application) parse(body string) map[string]string {
-	data := make(map[string]string)
+func (a *Application) parse(body string) map[string]models.Metric {
+	data := make(map[string]models.Metric)
 
 	// ToDo: switch to bytes buffer and maybe do not read body in caller?
 	splittedBody := strings.Split(body, "\n")
@@ -46,7 +48,10 @@ func (a *Application) parse(body string) map[string]string {
 			}
 		}
 
-		data[name] = value
+		metric := models.NewMetric(name, "", params)
+		metric.SetValue(value)
+
+		data[name] = metric
 	}
 
 	log.Printf("Data parsed: %+v\n", data)

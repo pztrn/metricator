@@ -2,9 +2,14 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"log"
 	"sync"
+
+	"go.dev.pztrn.name/metricator/internal/models"
 )
+
+var ErrMetricNotFound = errors.New("metric not found")
 
 // Storage is an in-memory storage.
 type Storage struct {
@@ -12,7 +17,7 @@ type Storage struct {
 	doneChan chan struct{}
 	name     string
 
-	data      map[string]string
+	data      map[string]models.Metric
 	dataMutex sync.RWMutex
 }
 
@@ -29,16 +34,16 @@ func NewStorage(ctx context.Context, name string) (*Storage, chan struct{}) {
 }
 
 // Get returns data from storage by key.
-func (s *Storage) Get(key string) string {
+func (s *Storage) Get(key string) (models.Metric, error) {
 	s.dataMutex.RLock()
 	defer s.dataMutex.RUnlock()
 
 	data, found := s.data[key]
 	if !found {
-		return "Not found"
+		return models.NewMetric("", "", nil), ErrMetricNotFound
 	}
 
-	return data
+	return data, nil
 }
 
 // GetDoneChan returns a channel which should be used to block execution
@@ -49,11 +54,11 @@ func (s *Storage) GetDoneChan() chan struct{} {
 
 // Initializes internal things.
 func (s *Storage) initialize() {
-	s.data = make(map[string]string)
+	s.data = make(map[string]models.Metric)
 }
 
 // Put puts passed data into storage.
-func (s *Storage) Put(data map[string]string) {
+func (s *Storage) Put(data map[string]models.Metric) {
 	s.dataMutex.Lock()
 	defer s.dataMutex.Unlock()
 
