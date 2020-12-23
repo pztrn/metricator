@@ -3,9 +3,11 @@ services:
     alias: docker
 
 variables:
+  DOCKER_IMAGE: registry.gitlab.pztrn.name/containers/mirror/docker:19.03.13-dind
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TCP_PORT: 2375
   DOCKER_TLS_CERTDIR: ""
+  LINTTEST_IMAGE: registry.gitlab.pztrn.name/containers/mirror/golangci/golangci-lint:v1.33.0
   REGISTRY_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
   REGISTRY_IMAGE_TAGGED: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
 
@@ -17,7 +19,7 @@ lint:
   stage: test
   tags:
     - docker
-  image: registry.gitlab.pztrn.name/containers/mirror/golangci/golangci-lint:v1.33.0
+  image: $LINTTEST_IMAGE
   script:
     - golangci-lint run
 
