@@ -48,7 +48,7 @@ func (a *Application) parse(body string) map[string]models.Metric {
 			}
 		}
 
-		metric := models.NewMetric(name, "", params)
+		metric := models.NewMetric(name, "", "", params)
 		metric.SetValue(value)
 
 		data[name] = metric

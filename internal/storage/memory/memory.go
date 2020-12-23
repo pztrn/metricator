@@ -40,7 +40,7 @@ func (s *Storage) Get(key string) (models.Metric, error) {
 
 	data, found := s.data[key]
 	if !found {
-		return models.NewMetric("", "", nil), ErrMetricNotFound
+		return models.NewMetric("", "", "", nil), ErrMetricNotFound
 	}
 
 	return data, nil
