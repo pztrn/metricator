@@ -16,13 +16,13 @@ Metricator instead acts like Prometheus itself from monitored software PoV: it p
 
 Also Metricator "reformats" metric names and parameters to be more easily parsed if needed, so:
 
-```
+```prometheus
 dnsdist_frontend_responses{frontend="127.0.0.1:53",proto="UDP",thread="0"}
 ```
 
 became:
 
-```
+```prometheus
 dnsdist_frontend_responses/frontend:127.0.0.1:53/proto:UDP/thread:0
 ```
 
@@ -30,3 +30,4 @@ dnsdist_frontend_responses/frontend:127.0.0.1:53/proto:UDP/thread:0
 
 * [Installation](INSTALL.md)
 * [Configuration](CONFIGURE.md)
+* [API](API.md)

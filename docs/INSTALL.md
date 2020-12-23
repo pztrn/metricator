@@ -12,7 +12,7 @@ This page describes all of them.
 
 To run Metricator in Docker simply run:
 
-```
+```bash
 docker run -v $(pwd)/metricator.yaml:/config.yaml -p 8080:34421 registry.gitlab.pztrn.name/pztrn/metricator:latest
 ```
 
@@ -20,7 +20,7 @@ Don't forget to create configuration file as described [here](CONFIGURE.md)!
 
 ### docker-compose
 
-```
+```docker-compose
 version: "2.4"
 
 services:
