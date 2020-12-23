@@ -2,7 +2,6 @@ package application
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 )
@@ -23,11 +22,11 @@ func (a *Application) fetch() {
 	a.fetchIsRunning = true
 	a.fetchIsRunningMutex.Unlock()
 
-	log.Println("Fetching data for", a.name)
+	a.logger.Infoln("Fetching data for", a.name)
 
 	req, err := http.NewRequestWithContext(a.ctx, "GET", a.config.Endpoint, nil)
 	if err != nil {
-		log.Println("Failed to create request for", a.name, "metrics:", err.Error())
+		a.logger.Infoln("Failed to create request for", a.name, "metrics:", err.Error())
 
 		return
 	}
@@ -38,7 +37,7 @@ func (a *Application) fetch() {
 
 	resp, err := a.httpClient.Do(req)
 	if err != nil {
-		log.Println("Failed to execute request for", a.name, "metrics:", err.Error())
+		a.logger.Infoln("Failed to execute request for", a.name, "metrics:", err.Error())
 
 		return
 	}
@@ -47,7 +46,7 @@ func (a *Application) fetch() {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Failed to read response body for", a.name, "metrics:", err.Error())
+		a.logger.Infoln("Failed to read response body for", a.name, "metrics:", err.Error())
 
 		return
 	}
@@ -70,7 +69,7 @@ func (a *Application) startFetcher() {
 		Timeout: time.Second * 5,
 	}
 
-	defer log.Println("Fetcher for", a.name, "completed")
+	defer a.logger.Debugln("Fetcher for", a.name, "completed")
 
 	// First fetch should be executed ASAP.
 	a.fetch()

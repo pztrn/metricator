@@ -10,3 +10,8 @@ applications:
     # Timeout between requests. Not neccessarily be exact and requests might
     # be sent in 60 or more seconds (in this example).
     time_between_requests: 60s
+
+# Logger's configuration.
+logger:
+  # Print debug output or not?
+  debug: false

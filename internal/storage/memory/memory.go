@@ -3,9 +3,9 @@ package memory
 import (
 	"context"
 	"errors"
-	"log"
 	"sync"
 
+	"go.dev.pztrn.name/metricator/internal/logger"
 	"go.dev.pztrn.name/metricator/internal/models"
 )
 
@@ -15,6 +15,7 @@ var ErrMetricNotFound = errors.New("metric not found")
 type Storage struct {
 	ctx      context.Context
 	doneChan chan struct{}
+	logger   *logger.Logger
 	name     string
 
 	data      map[string]models.Metric
@@ -22,10 +23,11 @@ type Storage struct {
 }
 
 // NewStorage creates new in-memory storage to use.
-func NewStorage(ctx context.Context, name string) (*Storage, chan struct{}) {
+func NewStorage(ctx context.Context, name string, logger *logger.Logger) (*Storage, chan struct{}) {
 	s := &Storage{
 		ctx:      ctx,
 		doneChan: make(chan struct{}),
+		logger:   logger,
 		name:     name,
 	}
 	s.initialize()
@@ -35,19 +37,27 @@ func NewStorage(ctx context.Context, name string) (*Storage, chan struct{}) {
 
 // Get returns data from storage by key.
 func (s *Storage) Get(key string) (models.Metric, error) {
+	s.logger.Debugln("Retrieving data for", key, "key from storage...")
+
 	s.dataMutex.RLock()
 	defer s.dataMutex.RUnlock()
 
 	data, found := s.data[key]
 	if !found {
+		s.logger.Infoln("Key", key, "not found in storage!")
+
 		return models.NewMetric("", "", "", nil), ErrMetricNotFound
 	}
+
+	s.logger.Debugf("Key %s found: %+v\n", key, data)
 
 	return data, nil
 }
 
 // GetAsSlice returns all data from storage as slice.
 func (s *Storage) GetAsSlice() []models.Metric {
+	s.logger.Debugln("Returning all stored metrics as slice...")
+
 	metrics := make([]models.Metric, 0, len(s.data))
 
 	for _, metric := range s.data {
@@ -80,7 +90,7 @@ func (s *Storage) Put(data map[string]models.Metric) {
 		}
 	}
 
-	log.Println("Put", len(data), "items in", s.name)
+	s.logger.Debugln("Put", len(data), "items in", s.name)
 }
 
 // Start starts asynchronous things if needed.
@@ -89,7 +99,7 @@ func (s *Storage) Start() {
 	go func() {
 		<-s.ctx.Done()
 
-		log.Println("In-memory storage", s.name, "done")
+		s.logger.Infoln("In-memory storage", s.name, "done")
 
 		s.doneChan <- struct{}{}
 	}()

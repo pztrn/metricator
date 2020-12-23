@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"go.dev.pztrn.name/metricator/internal/application"
+	"go.dev.pztrn.name/metricator/internal/logger"
 	"gopkg.in/yaml.v2"
 )
 
@@ -24,6 +25,8 @@ type Config struct {
 	// Applications describes configuration for remote application's endpoints.
 	// Key is an application's name.
 	Applications map[string]*application.Config `yaml:"applications"`
+	// Logger is a logging configuration.
+	Logger *logger.Config `yaml:"logger"`
 }
 
 // NewConfig returns new configuration.

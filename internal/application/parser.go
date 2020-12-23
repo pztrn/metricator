@@ -26,7 +26,7 @@ func (a *Application) parse(body string) map[string]models.Metric {
 			continue
 		}
 
-		// log.Println("Analyzing line:", line)
+		a.logger.Debugln("Analyzing line:", line)
 
 		name = a.getMetricName(line)
 		metric, found := data[name]
@@ -76,12 +76,12 @@ func (a *Application) parse(body string) map[string]models.Metric {
 
 		metric.Value = a.getMetricValue(line)
 
-		// log.Printf("Got metric: %+v\n", metric)
+		a.logger.Debugln("Got metric: %+v\n", metric)
 
 		data[name] = metric
 	}
 
-	// log.Printf("Data parsed: %+v\n", data)
+	a.logger.Debugln("Data parsed: %+v\n", data)
 
 	return data
 }

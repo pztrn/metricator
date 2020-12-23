@@ -12,6 +12,7 @@ import (
 	"go.dev.pztrn.name/metricator/internal/common"
 	"go.dev.pztrn.name/metricator/internal/configuration"
 	"go.dev.pztrn.name/metricator/internal/httpserver"
+	"go.dev.pztrn.name/metricator/internal/logger"
 )
 
 func main() {
@@ -24,8 +25,6 @@ func main() {
 
 	mainCtx, cancelFunc := context.WithCancel(context.Background())
 	config := configuration.NewConfig()
-
-	httpSrv, httpStopped := httpserver.NewHTTPServer(mainCtx, config)
 
 	// Parse configuration.
 	flag.Parse()
@@ -40,8 +39,11 @@ func main() {
 	// Create applications.
 	apps := make([]*application.Application, 0, len(config.Applications))
 
+	logger := logger.NewLogger(config.Logger)
+	httpSrv, httpStopped := httpserver.NewHTTPServer(mainCtx, config, logger)
+
 	for appName, appConfig := range config.Applications {
-		app := application.NewApplication(mainCtx, appName, appConfig)
+		app := application.NewApplication(mainCtx, appName, appConfig, logger)
 		app.Start()
 
 		httpSrv.RegisterHandlerForApplication(appName, app.GetHandler())

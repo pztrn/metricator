@@ -2,11 +2,11 @@ package application
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"sync"
 
 	"go.dev.pztrn.name/metricator/internal/common"
+	"go.dev.pztrn.name/metricator/internal/logger"
 	"go.dev.pztrn.name/metricator/internal/storage"
 	"go.dev.pztrn.name/metricator/internal/storage/memory"
 )
@@ -17,6 +17,7 @@ type Application struct {
 	config   *Config
 	ctx      context.Context
 	doneChan chan struct{}
+	logger   *logger.Logger
 	name     string
 
 	storage     storage.Metrics
@@ -29,11 +30,12 @@ type Application struct {
 }
 
 // NewApplication creates new application.
-func NewApplication(ctx context.Context, name string, config *Config) *Application {
+func NewApplication(ctx context.Context, name string, config *Config, logger *logger.Logger) *Application {
 	a := &Application{
 		config:   config,
 		ctx:      ctx,
 		doneChan: make(chan struct{}),
+		logger:   logger,
 		name:     name,
 	}
 	a.initialize()
@@ -54,9 +56,9 @@ func (a *Application) GetHandler() common.HTTPHandlerFunc {
 
 // Initializes internal things like storage, HTTP client, etc.
 func (a *Application) initialize() {
-	a.storage, a.storageDone = memory.NewStorage(a.ctx, a.name+" storage")
+	a.storage, a.storageDone = memory.NewStorage(a.ctx, a.name+" storage", a.logger)
 
-	log.Printf("Application '%s' initialized with configuration: %+v\n", a.name, a.config)
+	a.logger.Debugf("Application '%s' initialized with configuration: %+v\n", a.name, a.config)
 }
 
 // Start starts asynchronous things like data fetching, storage cleanup, etc.
@@ -71,7 +73,7 @@ func (a *Application) Start() {
 		// We should wait until storage routines are also stopped.
 		<-a.storage.GetDoneChan()
 
-		log.Println("Application", a.name, "stopped")
+		a.logger.Infoln("Application", a.name, "stopped")
 
 		a.doneChan <- struct{}{}
 	}()

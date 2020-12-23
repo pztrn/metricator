@@ -2,7 +2,6 @@ package httpserver
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -10,6 +9,7 @@ import (
 
 	"go.dev.pztrn.name/metricator/internal/common"
 	"go.dev.pztrn.name/metricator/internal/configuration"
+	"go.dev.pztrn.name/metricator/internal/logger"
 )
 
 // HTTPServer is a controlling structure for HTTP server.
@@ -17,15 +17,17 @@ type HTTPServer struct {
 	config   *configuration.Config
 	ctx      context.Context
 	doneChan chan struct{}
+	logger   *logger.Logger
 	handler  *handler
 	server   *http.Server
 }
 
-func NewHTTPServer(ctx context.Context, cfg *configuration.Config) (*HTTPServer, chan struct{}) {
+func NewHTTPServer(ctx context.Context, cfg *configuration.Config, logger *logger.Logger) (*HTTPServer, chan struct{}) {
 	h := &HTTPServer{
 		config:   cfg,
 		ctx:      ctx,
 		doneChan: make(chan struct{}),
+		logger:   logger,
 	}
 	h.initialize()
 
@@ -40,6 +42,8 @@ func (h *HTTPServer) getRequestContext(_ net.Listener) context.Context {
 
 // Initializes handler and HTTP server structure.
 func (h *HTTPServer) initialize() {
+	h.logger.Debugln("Initializing HTTP server...")
+
 	h.handler = &handler{
 		handlers: make(map[string]common.HTTPHandlerFunc),
 	}
@@ -58,6 +62,7 @@ func (h *HTTPServer) initialize() {
 
 // RegisterHandlerForApplication registers HTTP handler for application.
 func (h *HTTPServer) RegisterHandlerForApplication(name string, handler common.HTTPHandlerFunc) {
+	h.logger.Debugln("Registering handler for application", name)
 	h.handler.register(name, handler)
 }
 
@@ -68,21 +73,21 @@ func (h *HTTPServer) Start() {
 		err := h.server.ListenAndServe()
 		if err != nil {
 			if !strings.Contains(err.Error(), "Server closed") {
-				log.Println("HTTP server failed to listen:", err.Error())
+				h.logger.Infoln("HTTP server failed to listen:", err.Error())
 			}
 		}
 	}()
 
 	go func() {
 		<-h.ctx.Done()
-		log.Println("Shutting down HTTP server")
+		h.logger.Infoln("Shutting down HTTP server")
 
 		err := h.server.Shutdown(h.ctx)
 		if err != nil && !strings.Contains(err.Error(), "context canceled") {
-			log.Println("Failed to stop HTTP server:", err.Error())
+			h.logger.Infoln("Failed to stop HTTP server:", err.Error())
 		}
 
-		log.Println("HTTP server stopped")
+		h.logger.Infoln("HTTP server stopped")
 
 		h.doneChan <- struct{}{}
 	}()
