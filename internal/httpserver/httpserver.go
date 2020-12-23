@@ -22,6 +22,8 @@ type HTTPServer struct {
 	server   *http.Server
 }
 
+// NewHTTPServer creates HTTP server and executes preliminary initialization
+// (HTTP server structure initialized but it doesn't start).
 func NewHTTPServer(ctx context.Context, cfg *configuration.Config, logger *logger.Logger) (*HTTPServer, chan struct{}) {
 	h := &HTTPServer{
 		config:   cfg,

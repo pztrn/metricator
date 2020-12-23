@@ -9,16 +9,16 @@ import (
 	"go.dev.pztrn.name/metricator/internal/models"
 )
 
+// ErrMetricNotFound appears if requested metric wasn't found in storage.
 var ErrMetricNotFound = errors.New("metric not found")
 
 // Storage is an in-memory storage.
 type Storage struct {
-	ctx      context.Context
-	doneChan chan struct{}
-	logger   *logger.Logger
-	name     string
-
+	ctx       context.Context
+	doneChan  chan struct{}
+	logger    *logger.Logger
 	data      map[string]models.Metric
+	name      string
 	dataMutex sync.RWMutex
 }
 

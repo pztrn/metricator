@@ -137,7 +137,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Process request type. Here we process only known requests types,
-	// by default request should go to specific application's handler.
+	// all other requests will produce HTTP 400 error.
 	switch rInfo.RequestType {
 	// ToDo: move to constants.
 	case "apps_list":
