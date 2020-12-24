@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"go.dev.pztrn.name/metricator/internal/logger"
-	"go.dev.pztrn.name/metricator/internal/models"
+	"go.dev.pztrn.name/metricator/pkg/schema"
 )
 
 // ErrMetricNotFound appears if requested metric wasn't found in storage.
@@ -17,7 +17,7 @@ type Storage struct {
 	ctx       context.Context
 	doneChan  chan struct{}
 	logger    *logger.Logger
-	data      map[string]models.Metric
+	data      map[string]schema.Metric
 	name      string
 	dataMutex sync.RWMutex
 }
@@ -36,7 +36,7 @@ func NewStorage(ctx context.Context, name string, logger *logger.Logger) (*Stora
 }
 
 // Get returns data from storage by key.
-func (s *Storage) Get(key string) (models.Metric, error) {
+func (s *Storage) Get(key string) (schema.Metric, error) {
 	s.logger.Debugln("Retrieving data for", key, "key from storage...")
 
 	s.dataMutex.RLock()
@@ -46,7 +46,7 @@ func (s *Storage) Get(key string) (models.Metric, error) {
 	if !found {
 		s.logger.Infoln("Key", key, "not found in storage!")
 
-		return models.NewMetric("", "", "", nil), ErrMetricNotFound
+		return schema.NewMetric("", "", "", nil), ErrMetricNotFound
 	}
 
 	s.logger.Debugf("Key %s found: %+v\n", key, data)
@@ -55,10 +55,10 @@ func (s *Storage) Get(key string) (models.Metric, error) {
 }
 
 // GetAsSlice returns all data from storage as slice.
-func (s *Storage) GetAsSlice() []models.Metric {
+func (s *Storage) GetAsSlice() []schema.Metric {
 	s.logger.Debugln("Returning all stored metrics as slice...")
 
-	metrics := make([]models.Metric, 0, len(s.data))
+	metrics := make([]schema.Metric, 0, len(s.data))
 
 	for _, metric := range s.data {
 		metrics = append(metrics, metric)
@@ -75,11 +75,11 @@ func (s *Storage) GetDoneChan() chan struct{} {
 
 // Initializes internal things.
 func (s *Storage) initialize() {
-	s.data = make(map[string]models.Metric)
+	s.data = make(map[string]schema.Metric)
 }
 
 // Put puts passed data into storage.
-func (s *Storage) Put(data map[string]models.Metric) {
+func (s *Storage) Put(data map[string]schema.Metric) {
 	s.dataMutex.Lock()
 	defer s.dataMutex.Unlock()
 

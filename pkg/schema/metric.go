@@ -1,6 +1,6 @@
-package models
+package schema
 
-// Metric is a generic metric structure.
+// Metric is a generic metric structure. Used in HTTP responses and data storage.
 type Metric struct {
 	// BaseName is a metric's base name, used for constructing name.
 	BaseName string

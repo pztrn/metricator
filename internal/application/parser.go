@@ -3,12 +3,12 @@ package application
 import (
 	"strings"
 
-	"go.dev.pztrn.name/metricator/internal/models"
+	"go.dev.pztrn.name/metricator/pkg/schema"
 )
 
 // Parses passed body and returns a map suitable for pushing into storage.
-func (a *Application) parse(body string) map[string]models.Metric {
-	data := make(map[string]models.Metric)
+func (a *Application) parse(body string) map[string]schema.Metric {
+	data := make(map[string]schema.Metric)
 
 	// ToDo: switch to bytes buffer and maybe do not read body in caller?
 	splittedBody := strings.Split(body, "\n")
@@ -35,7 +35,7 @@ func (a *Application) parse(body string) map[string]models.Metric {
 		if !found {
 			a.logger.Debugln("Metric wasn't yet created, creating new structure")
 
-			metric = models.NewMetric(name, "", "", nil)
+			metric = schema.NewMetric(name, "", "", nil)
 		}
 
 		a.logger.Debugf("Got metric to use: %+v\n", metric)
