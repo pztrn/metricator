@@ -31,3 +31,4 @@ dnsdist_frontend_responses/frontend:127.0.0.1:53/proto:UDP/thread:0
 * [Installation](INSTALL.md)
 * [Configuration](CONFIGURE.md)
 * [API](API.md)
+* [Client](CLIENT.md)

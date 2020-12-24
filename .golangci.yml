@@ -18,6 +18,7 @@ linters-settings:
     min-complexity: 40
   funlen:
     lines: 200
+    statements: 100
 
 issues:
   exclude-rules:
