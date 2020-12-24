@@ -1,5 +1,6 @@
 package common
 
+// nolint:gochecknoglobals
 var (
 	Branch     string
 	Build      string

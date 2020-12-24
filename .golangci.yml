@@ -3,17 +3,10 @@ run:
 linters:
   enable-all: true
   disable:
-    # Because globals might exist, but according to our codestyle they
-    # should be lowercased and considered as unexported.
-    - gochecknoglobals
     # While it might be useful it'll create more problems that will solve.
     - gocritic
-    # Complains about main() lengths, which isn't an issue.
-    - funlen
     # Magic numbers might be everywhere. Disabled for now.
     - gomnd
-    # ToDos everywhere
-    - godox
     # Why? WHY? WHY _test???
     - testpackage
 linters-settings:
@@ -23,3 +16,12 @@ linters-settings:
     min-complexity: 40
   gocognit:
     min-complexity: 40
+  funlen:
+    lines: 200
+
+issues:
+  exclude-rules:
+    # There will be some ToDos.
+    - linters:
+        - godox
+      text: "TODO"

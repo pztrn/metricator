@@ -13,6 +13,7 @@ import (
 	"go.dev.pztrn.name/metricator/internal/models"
 )
 
+// nolint:gochecknoglobals
 var (
 	errInvalidAPIVersion  = errors.New("invalid API version")
 	errInvalidApplication = errors.New("invalid application")
