@@ -11,6 +11,7 @@ import (
 	"go.dev.pztrn.name/metricator/internal/configuration"
 	"go.dev.pztrn.name/metricator/internal/logger"
 	"go.dev.pztrn.name/metricator/pkg/client"
+	"go.dev.pztrn.name/metricator/pkg/schema"
 )
 
 // nolint:gochecknoglobals
@@ -21,6 +22,7 @@ var (
 	metricatorTimeout = flag.Int("metricator-timeout", 5, "Timeout for requests sent to Metricator.")
 	metricsList       = flag.Bool("metrics-list", false, "Show metrics list. Requires 'application' parameter.")
 	metric            = flag.String("metric", "", "Metric data to retrieve. Requires 'application' parameter.")
+	output            = flag.String("output", "json", "Output format. Can be 'json' or 'plain-by-line'.")
 )
 
 func main() {
@@ -94,12 +96,61 @@ func main() {
 		data = c.GetMetric(*application, *metric)
 	}
 
-	dataAsBytes, err := json.Marshal(data)
-	if err != nil {
-		logger.Infoln("Failed to marshal data from Metricator:", err.Error())
+	switch *output {
+	case "json":
+		dataAsBytes, err := json.Marshal(data)
+		if err != nil {
+			logger.Infoln("Failed to marshal data from Metricator:", err.Error())
 
-		os.Exit(2)
+			os.Exit(2)
+		}
+
+		fmt.Println(string(dataAsBytes))
+	case "plain-by-lines":
+		// For plain mode if we request metric - we should just print it and exit.
+		if *metric != "" {
+			fmt.Println(data)
+			os.Exit(0)
+		}
+
+		dataToPrint := []string{}
+
+		switch {
+		case *appsList:
+			appsListData, ok := data.(schema.AppsList)
+			if !ok {
+				logger.Infoln("Failed to cast parsed data into schema.AppsList!")
+
+				os.Exit(3)
+			}
+
+			for _, app := range appsListData {
+				dataToPrint = append(dataToPrint, app)
+			}
+		case *metric != "":
+			metricData, ok := data.(string)
+			if !ok {
+				logger.Infoln("Failed to cast parsed data into string!")
+
+				os.Exit(3)
+			}
+
+			dataToPrint = append(dataToPrint, metricData)
+		case *metricsList:
+			metricsData, ok := data.(schema.Metrics)
+			if !ok {
+				logger.Infoln("Failed to cast parsed data into schema.Metrics!")
+
+				os.Exit(3)
+			}
+
+			for _, metric := range metricsData {
+				dataToPrint = append(dataToPrint, metric.Name)
+			}
+		}
+
+		for _, line := range dataToPrint {
+			fmt.Println(line)
+		}
 	}
-
-	fmt.Println(string(dataAsBytes))
 }
