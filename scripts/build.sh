@@ -2,6 +2,8 @@
 
 # Metricator build script.
 
+GO=${GO:=$(which go)}
+
 source ./scripts/shell_helpers/get_git_data.sh
 
 WHATTOBUILD=$1
@@ -12,6 +14,8 @@ LINKERFLAGS="\
 -X go.dev.pztrn.name/metricator/internal/common.CommitHash=${COMMITHASH} \
 -X go.dev.pztrn.name/metricator/internal/common.Version=${VERSION}"
 
+
+echo "Using $(go version) at ${GO}"
 
 cd cmd/${WHATTOBUILD}
 go build -tags netgo -ldflags "${LINKERFLAGS} -w -extldflags '-static'" -o ../../._bin/${WHATTOBUILD}
