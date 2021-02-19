@@ -4,7 +4,11 @@
 
 GO=${GO:=$(which go)}
 
-source ./scripts/shell_helpers/get_git_data.sh
+if [ -d .git ]; then
+    source ./scripts/shell_helpers/get_git_data.sh
+else
+    source ./scripts/shell_helpers/get_release_data.sh
+fi
 
 WHATTOBUILD=$1
 
@@ -18,4 +22,4 @@ LINKERFLAGS="\
 echo "Using $(go version) at ${GO}"
 
 cd cmd/${WHATTOBUILD}
-go build -tags netgo -ldflags "${LINKERFLAGS} -w -extldflags '-static'" -o ../../._bin/${WHATTOBUILD}
+${GO} build -tags netgo -ldflags "${LINKERFLAGS} -w -extldflags '-static'" -o ../../._bin/${WHATTOBUILD}
