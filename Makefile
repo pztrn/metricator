@@ -16,12 +16,12 @@ check-build-dir:
 
 ## metricator-client-build: builds metricator client and places into ${PWD}/._bin.
 metricator-client-build: check-build-dir
-	@rm ./._bin/metricator-client || true
+	@if [ -f ./._bin/metricator-client ]; then rm ./._bin/metricator-client; fi
 	@scripts/build.sh metricator-client
 
 ## metricatord-build: builds metricator daemon and places into ${PWD}/._bin.
 metricatord-build: check-build-dir
-	@rm ./._bin/metricatord || true
+	@if [ -f ./._bin/metricatord ]; then rm ./._bin/metricatord; fi
 	@scripts/build.sh metricatord
 
 ## metricator-client-run: starts metricator client. Use ARGS to supply args.
