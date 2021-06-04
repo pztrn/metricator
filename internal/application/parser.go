@@ -1,30 +1,33 @@
 package application
 
 import (
+	"bufio"
+	"fmt"
+	"io"
 	"strings"
 
 	"go.dev.pztrn.name/metricator/pkg/schema"
 )
 
-// Parses passed body and returns a map suitable for pushing into storage.
-func (a *Application) parse(body string) map[string]schema.Metric {
+// Parses io.Reader passed and returns a map suitable for pushing into storage.
+func (a *Application) parse(r io.Reader) (map[string]schema.Metric, error) {
 	data := make(map[string]schema.Metric)
 
-	// ToDo: switch to bytes buffer and maybe do not read body in caller?
-	splittedBody := strings.Split(body, "\n")
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		line := scanner.Text()
 
-	for _, line := range splittedBody {
+		// Skip empty lines.
+		if line == "" {
+			continue
+		}
+
 		// Prometheus line contains metric name and metric parameters defined
 		// in "{}".
 		var (
 			name   string
 			params []string
 		)
-
-		// Skip empty lines.
-		if line == "" {
-			continue
-		}
 
 		a.logger.Debugln("Analyzing line:", line)
 
@@ -80,19 +83,22 @@ func (a *Application) parse(body string) map[string]schema.Metric {
 			newMetric.Params = params
 
 			metric = newMetric
-			data[metric.Name] = metric
 		}
 
 		metric.Value = a.getMetricValue(line)
 
 		a.logger.Debugf("Got metric: %+v\n", metric)
 
-		data[name] = metric
+		data[metric.Name] = metric
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("wasn't able to scan input: %w", err)
 	}
 
 	a.logger.Debugf("Data parsed: %+v\n", data)
 
-	return data
+	return data, nil
 }
 
 // Gets metric description from passed line.
