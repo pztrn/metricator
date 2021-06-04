@@ -9,6 +9,10 @@ type Logger struct {
 
 // NewLogger creates new logging wrapper and returns it to caller.
 func NewLogger(config *Config) *Logger {
+	if config == nil {
+		config = &Config{Debug: false}
+	}
+
 	l := &Logger{config: config}
 
 	return l

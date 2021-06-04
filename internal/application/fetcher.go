@@ -1,7 +1,6 @@
 package application
 
 import (
-	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -44,14 +43,12 @@ func (a *Application) fetch() {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	data, err := a.parse(resp.Body)
 	if err != nil {
-		a.logger.Infoln("Failed to read response body for", a.name, "metrics:", err.Error())
+		a.logger.Infoln("Failed to parse response body for", a.name, "metrics:", err.Error())
 
 		return
 	}
-
-	data := a.parse(string(body))
 
 	a.storage.Put(data)
 
