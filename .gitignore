@@ -2,3 +2,4 @@
 .vscode
 metricator.yaml
 .idea
+*DS_Store*
