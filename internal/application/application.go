@@ -28,16 +28,18 @@ type Application struct {
 
 // NewApplication creates new application.
 func NewApplication(ctx context.Context, name string, config *Config, logger *logger.Logger) *Application {
-	a := &Application{
+	// Some variables are initialized in initialize() function.
+	// nolint:exhaustivestruct
+	app := &Application{
 		config:   config,
 		ctx:      ctx,
 		doneChan: make(chan struct{}),
 		logger:   logger,
 		name:     name,
 	}
-	a.initialize()
+	app.initialize()
 
-	return a
+	return app
 }
 
 // GetDoneChan returns a channel which should be used to block execution until

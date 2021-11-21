@@ -29,8 +29,7 @@ func main() {
 	// Parse configuration.
 	flag.Parse()
 
-	err := config.Parse()
-	if err != nil {
+	if err := config.Parse(); err != nil {
 		log.Fatalln("Failed to parse configuration:", err.Error())
 	}
 

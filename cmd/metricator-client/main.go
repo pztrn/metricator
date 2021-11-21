@@ -25,6 +25,9 @@ var (
 	output            = flag.String("output", "json", "Output format. Can be 'json' or 'plain-by-line'.")
 )
 
+// This function uses fmt.Println to print lines without timestamps to make it easy
+// to parse output, so:
+// nolint:forbidigo
 func main() {
 	config := configuration.NewConfig()
 
@@ -83,17 +86,17 @@ func main() {
 		Timeout: *metricatorTimeout,
 	}
 
-	c := client.NewClient(clientConfig, logger)
+	clnt := client.NewClient(clientConfig, logger)
 
 	var data interface{}
 
 	switch {
 	case *appsList:
-		data = c.GetAppsList()
+		data = clnt.GetAppsList()
 	case *metricsList:
-		data = c.GetMetricsList(*application)
+		data = clnt.GetMetricsList(*application)
 	case *metric != "":
-		data = c.GetMetric(*application, *metric)
+		data = clnt.GetMetric(*application, *metric)
 	}
 
 	switch *output {

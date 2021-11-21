@@ -48,14 +48,14 @@ func (h *handler) getAppsList() ([]byte, error) {
 
 // Gets request information from URL. Returns a structure with filled request
 // info and error if it occurs.
-func (h *handler) getRequestInfo(r *http.Request) (*models.RequestInfo, error) {
+func (h *handler) getRequestInfo(req *http.Request) (*models.RequestInfo, error) {
 	// Request isn't for API or isn't versioned.
-	if !strings.HasPrefix(r.URL.Path, "/api/v") {
+	if !strings.HasPrefix(req.URL.Path, "/api/v") {
 		return nil, errInvalidPath
 	}
 
 	// Note: first element will always be empty!
-	pathSplitted := strings.Split(r.URL.Path, "/")
+	pathSplitted := strings.Split(req.URL.Path, "/")
 
 	// Request is for API but not enough items in URL was passed.
 	if len(pathSplitted) < 4 {
@@ -119,20 +119,20 @@ func (h *handler) register(appName string, hndl common.HTTPHandlerFunc) {
 }
 
 // ServeHTTP handles every HTTP request.
-func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *handler) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 	startTime := time.Now()
 
 	defer func() {
 		requestDuration := time.Since(startTime)
 
-		log.Printf("[HTTP Request] from %s to %s, duration %.4fs\n", r.RemoteAddr, r.URL.Path, requestDuration.Seconds())
+		log.Printf("[HTTP Request] from %s to %s, duration %.4fs\n", req.RemoteAddr, req.URL.Path, requestDuration.Seconds())
 	}()
 
 	// Validate request and extract needed info.
-	rInfo, err := h.getRequestInfo(r)
+	rInfo, err := h.getRequestInfo(req)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte("400 bad request - " + err.Error()))
+		writer.WriteHeader(http.StatusBadRequest)
+		_, _ = writer.Write([]byte("400 bad request - " + err.Error()))
 
 		return
 	}
@@ -144,14 +144,14 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "apps_list":
 		appsList, err := h.getAppsList()
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("400 bad request - " + err.Error()))
+			writer.WriteHeader(http.StatusBadRequest)
+			_, _ = writer.Write([]byte("400 bad request - " + err.Error()))
 
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(appsList)
+		writer.WriteHeader(http.StatusOK)
+		_, _ = writer.Write(appsList)
 
 		return
 	case "info":
@@ -169,15 +169,15 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		infoBytes, _ := json.Marshal(infoData)
 
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(infoBytes)
+		writer.WriteHeader(http.StatusOK)
+		_, _ = writer.Write(infoBytes)
 
 		return
 	case "metrics":
 		handler, found := h.handlers[rInfo.Application]
 		if !found {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("400 bad request - " + errInvalidApplication.Error()))
+			writer.WriteHeader(http.StatusBadRequest)
+			_, _ = writer.Write([]byte("400 bad request - " + errInvalidApplication.Error()))
 
 			return
 		}
@@ -185,16 +185,16 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// Get data from handler.
 		data := handler(rInfo)
 		if data == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("400 bad request - " + errNoData.Error()))
+			writer.WriteHeader(http.StatusBadRequest)
+			_, _ = writer.Write([]byte("400 bad request - " + errNoData.Error()))
 		}
 
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(data))
+		writer.WriteHeader(http.StatusOK)
+		_, _ = writer.Write([]byte(data))
 
 		return
 	}
 
-	w.WriteHeader(http.StatusBadRequest)
-	_, _ = w.Write([]byte("400 bad request - " + errInvalidPath.Error()))
+	writer.WriteHeader(http.StatusBadRequest)
+	_, _ = writer.Write([]byte("400 bad request - " + errInvalidPath.Error()))
 }

@@ -18,7 +18,7 @@ type Metric struct {
 
 // NewMetric creates new structure for storing single metric data.
 func NewMetric(name, mType, description string, params []string) Metric {
-	m := Metric{
+	metric := Metric{
 		BaseName:    name,
 		Name:        name,
 		Description: description,
@@ -27,7 +27,7 @@ func NewMetric(name, mType, description string, params []string) Metric {
 		Value:       "",
 	}
 
-	return m
+	return metric
 }
 
 // GetValue returns metric's value.

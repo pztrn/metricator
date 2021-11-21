@@ -143,8 +143,8 @@ func (a *Application) getParametersForPrometheusMetric(line string) []string {
 		paramNameFinished, paramValueStarted, paramValueFinished bool
 	)
 
-	for _, r := range valuesString {
-		if paramValueFinished && string(r) == "," {
+	for _, runeChar := range valuesString {
+		if paramValueFinished && string(runeChar) == "," {
 			params = append(params, paramName+":"+paramValue)
 			paramName, paramValue = "", ""
 			paramNameFinished, paramValueStarted, paramValueFinished = false, false, false
@@ -156,8 +156,8 @@ func (a *Application) getParametersForPrometheusMetric(line string) []string {
 		// "deeply nested"? I think not. So:
 		// nolint:nestif
 		if !paramNameFinished {
-			if string(r) != "=" {
-				paramName += string(r)
+			if string(runeChar) != "=" {
+				paramName += string(runeChar)
 
 				continue
 			} else {
@@ -166,19 +166,19 @@ func (a *Application) getParametersForPrometheusMetric(line string) []string {
 				continue
 			}
 		} else {
-			if string(r) == "\"" && !paramValueStarted {
+			if string(runeChar) == "\"" && !paramValueStarted {
 				paramValueStarted = true
 
 				continue
 			}
 
-			if paramValueStarted && string(r) != "\"" {
-				paramValue += string(r)
+			if paramValueStarted && string(runeChar) != "\"" {
+				paramValue += string(runeChar)
 
 				continue
 			}
 
-			if paramValueStarted && string(r) == "\"" {
+			if paramValueStarted && string(runeChar) == "\"" {
 				paramValueFinished = true
 
 				continue

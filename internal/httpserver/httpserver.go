@@ -25,15 +25,16 @@ type HTTPServer struct {
 // NewHTTPServer creates HTTP server and executes preliminary initialization
 // (HTTP server structure initialized but it doesn't start).
 func NewHTTPServer(ctx context.Context, cfg *configuration.Config, logger *logger.Logger) (*HTTPServer, chan struct{}) {
-	h := &HTTPServer{
+	// nolint:exhaustivestruct
+	httpServer := &HTTPServer{
 		config:   cfg,
 		ctx:      ctx,
 		doneChan: make(chan struct{}),
 		logger:   logger,
 	}
-	h.initialize()
+	httpServer.initialize()
 
-	return h, h.doneChan
+	return httpServer, httpServer.doneChan
 }
 
 // Returns request's context based on main context of application.

@@ -10,6 +10,9 @@ func (a *Application) fetch() {
 	// Do not do anything if fetching is running.
 	// ToDo: maybe another approach?
 	a.fetchIsRunningMutex.RLock()
+	// This is an optimization to avoid excessive waiting when using Lock().
+	// Most of time application will wait between fetches.
+	// nolint:ifshort
 	isFetching := a.fetchIsRunning
 	a.fetchIsRunningMutex.RUnlock()
 

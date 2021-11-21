@@ -23,13 +23,14 @@ type Client struct {
 
 // NewClient creates new Metricator client.
 func NewClient(config *Config, logger *logger.Logger) *Client {
-	c := &Client{
+	// nolint:exhaustivestruct
+	client := &Client{
 		config: config,
 		logger: logger,
 	}
-	c.initialize()
+	client.initialize()
 
-	return c
+	return client
 }
 
 // Executes request and parses it's contents.

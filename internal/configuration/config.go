@@ -21,16 +21,18 @@ var (
 
 // Config is an application's configuration.
 type Config struct {
-	configPath string
 	// Applications describes configuration for remote application's endpoints.
 	// Key is an application's name.
 	Applications map[string]*application.Config `yaml:"applications"`
 	// Logger is a logging configuration.
-	Logger *logger.Config `yaml:"logger"`
+	Logger     *logger.Config `yaml:"logger"`
+	configPath string
 }
 
 // NewConfig returns new configuration.
 func NewConfig() *Config {
+	// Fields are initialized when parsing YAML file.
+	// nolint:exhaustivestruct
 	c := &Config{}
 	c.initialize()
 

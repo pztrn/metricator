@@ -11,5 +11,6 @@ type Config struct {
 	Endpoint string `yaml:"endpoint"`
 	// TimeBetweenRequests is a minimal amount of time which should pass
 	// between requests.
+	// nolint:tagliatelle
 	TimeBetweenRequests time.Duration `yaml:"time_between_requests"`
 }

@@ -14,25 +14,27 @@ var ErrMetricNotFound = errors.New("metric not found")
 
 // Storage is an in-memory storage.
 type Storage struct {
+	dataMutex sync.RWMutex
 	ctx       context.Context
 	doneChan  chan struct{}
 	logger    *logger.Logger
 	data      map[string]schema.Metric
 	name      string
-	dataMutex sync.RWMutex
 }
 
 // NewStorage creates new in-memory storage to use.
 func NewStorage(ctx context.Context, name string, logger *logger.Logger) (*Storage, chan struct{}) {
-	s := &Storage{
+	// nolint:exhaustivestruct
+	storage := &Storage{
 		ctx:      ctx,
 		doneChan: make(chan struct{}),
 		logger:   logger,
 		name:     name,
+		data:     make(map[string]schema.Metric),
 	}
-	s.initialize()
+	storage.initialize()
 
-	return s, s.doneChan
+	return storage, storage.doneChan
 }
 
 // Get returns data from storage by key.
