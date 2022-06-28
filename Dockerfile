@@ -1,4 +1,4 @@
-FROM registry.gitlab.pztrn.name/containers/mirror/golang:1.15.5-alpine AS build
+FROM code.pztrn.name/containers/mirror/golang:1.18.3-alpine AS build
 
 WORKDIR /go/src/gitlab.pztrn.name/pztrn/metricator
 COPY . .
@@ -13,7 +13,7 @@ RUN apk add bash git make
 RUN make metricatord-build
 RUN make metricator-client-build
 
-FROM registry.gitlab.pztrn.name/containers/mirror/golang:1.15.5-alpine
+FROM code.pztrn.name/containers/mirror/golang:1.18.3-alpine
 LABEL maintainer="Stanislav N. <pztrn@pztrn.name>"
 
 COPY --from=build /go/src/gitlab.pztrn.name/pztrn/metricator/._bin/metricatord /usr/local/bin/metricatord
