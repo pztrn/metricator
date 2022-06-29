@@ -23,7 +23,7 @@ type Client struct {
 
 // NewClient creates new Metricator client.
 func NewClient(config *Config, logger *logger.Logger) *Client {
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	client := &Client{
 		config: config,
 		logger: logger,
@@ -140,7 +140,7 @@ func (c *Client) GetMetricsList(appName string) schema.Metrics {
 // Initializes internal states and storages.
 func (c *Client) initialize() {
 	// We do not need to set everything for client actually, so:
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	c.httpClient = &http.Client{
 		Timeout: time.Second * time.Duration(c.config.Timeout),
 	}

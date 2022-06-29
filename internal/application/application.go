@@ -29,7 +29,7 @@ type Application struct {
 // NewApplication creates new application.
 func NewApplication(ctx context.Context, name string, config *Config, logger *logger.Logger) *Application {
 	// Some variables are initialized in initialize() function.
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	app := &Application{
 		config:   config,
 		ctx:      ctx,

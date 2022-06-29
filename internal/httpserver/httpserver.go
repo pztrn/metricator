@@ -25,7 +25,7 @@ type HTTPServer struct {
 // NewHTTPServer creates HTTP server and executes preliminary initialization
 // (HTTP server structure initialized but it doesn't start).
 func NewHTTPServer(ctx context.Context, cfg *configuration.Config, logger *logger.Logger) (*HTTPServer, chan struct{}) {
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	httpServer := &HTTPServer{
 		config:   cfg,
 		ctx:      ctx,
@@ -51,7 +51,7 @@ func (h *HTTPServer) initialize() {
 		handlers: make(map[string]common.HTTPHandlerFunc),
 	}
 	// We do not need to specify all possible parameters for HTTP server, so:
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	h.server = &http.Server{
 		// ToDo: make it all configurable.
 		Addr:           ":34421",

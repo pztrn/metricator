@@ -167,6 +167,7 @@ func (h *handler) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 			Version:    common.Version,
 		}
 
+		// nolint:errchkjson
 		infoBytes, _ := json.Marshal(infoData)
 
 		writer.WriteHeader(http.StatusOK)

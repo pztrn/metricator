@@ -32,7 +32,7 @@ type Config struct {
 // NewConfig returns new configuration.
 func NewConfig() *Config {
 	// Fields are initialized when parsing YAML file.
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	c := &Config{}
 	c.initialize()
 

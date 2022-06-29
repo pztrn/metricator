@@ -24,7 +24,7 @@ type Storage struct {
 
 // NewStorage creates new in-memory storage to use.
 func NewStorage(ctx context.Context, name string, logger *logger.Logger) (*Storage, chan struct{}) {
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	storage := &Storage{
 		ctx:      ctx,
 		doneChan: make(chan struct{}),

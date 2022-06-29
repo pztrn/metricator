@@ -9,6 +9,10 @@ linters:
     - gomnd
     # Why? WHY? WHY _test???
     - testpackage
+    # Structs will contain some context.Context.
+    - containedctx
+    # Deprecated
+    - exhaustivestruct
 linters-settings:
   lll:
     line-length: 120
