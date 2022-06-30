@@ -18,10 +18,22 @@ steps:
     commands:
       - go test ./...
 
-  - name: docker
+  - name: build master image
     image: code.pztrn.name/containers/mirror/plugins/docker:20.13.0
     when:
       branch: ["master"]
+    settings:
+      registry: code.pztrn.name
+      username: drone
+      password:
+        from_secret: drone_secret
+      repo: code.pztrn.name/apps/metricator
+      auto_tag: true
+
+  - name: build tagged image
+    image: code.pztrn.name/containers/mirror/plugins/docker:20.13.0
+    when:
+      event: ["tag"]
     settings:
       registry: code.pztrn.name
       username: drone
